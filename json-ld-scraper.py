@@ -40,6 +40,7 @@ def ldifySegments(segmentJson, episodePid):
         # segment context and type
         segmentEvent["segment"]["@context"] = {
             "dct": "http://purl.org/dc/terms/",
+            "mo": "http://purl.org/ontology/mo/",
             "pid": "@id",
             "duration": "po:duration",
             "record_id": "mo:recorded_as",
@@ -71,6 +72,7 @@ def ldifySegments(segmentJson, episodePid):
         for contrib in segmentEvent["segment"]["contributions"]:
             contrib["@context"] = {
                 "@base": "http://slobr.linkedmusic.org/contributors/",
+                "mo": "http://purl.org/ontology/mo/",
                 "pid": "@id", 
                 "name": "foaf:name", 
                 "role": "slobr:contributor_role",
@@ -85,6 +87,7 @@ def ldifyEpisode(episodeJson):
     episodeJson['@context'] = {
         "pid" : "@id",
         "@base": "http://slobr.linkedmusic.org/",
+        "slobr": "http://slobr.linkedmusic.org/terms/",
         "dct": "http://purl.org/dc/terms/",
         "po": "http://www.bbc.co.uk/ontologies/programmes/",
         "short_synopsis": "po:short_synopsis",
@@ -92,7 +95,7 @@ def ldifyEpisode(episodeJson):
         "long_synopsis": "po:long_synopsis",
         "title": "dct:title", 
         "first_broadcast_date": "dct:date",
-        "image": "dc:relation",
+        "image": "dct:relation",
         "peers": "slobr:peers"
     }
     episodeJson["@type"] = "po:Episode"
