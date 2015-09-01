@@ -39,6 +39,7 @@ def ldifySegments(segmentJson, episodePid):
 
         # segment context and type
         segmentEvent["segment"]["@context"] = {
+            "po": "http://purl.org/ontology/po/",
             "dct": "http://purl.org/dc/terms/",
             "mo": "http://purl.org/ontology/mo/",
             "pid": "@id",
@@ -51,13 +52,15 @@ def ldifySegments(segmentJson, episodePid):
             "publisher": "dct:publisher",
             "record_label": "mo:label",
             "release_title": "slobr:release_title",
-            "catalogue_nunber": "dct:identifier", 
+            "catalogue_number": "dct:identifier", 
             "title": "dct:title",
             "short_synopsis": "po:short_synopsis",
             "medium_synopsis": "po:medium_synopsis",
             "long_synopsis": "po:long_synopsis",
             "contributions": "dct:contributor"
         }
+        
+        segmentEvent["segment"]["@type"] = "po:MusicSegment"
 
         # restructure record_id and add context
         segmentEvent["segment"]["record_id"] = {
@@ -67,6 +70,7 @@ def ldifySegments(segmentJson, episodePid):
             },
             "record_id": segmentEvent["segment"]["record_id"]
         }
+
 
         # contributions context and type
         for contrib in segmentEvent["segment"]["contributions"]:
@@ -79,6 +83,12 @@ def ldifySegments(segmentJson, episodePid):
                 "musicbrainz_gid": "mo:musicbrainz_guid"
             }
             contrib["@type"] = "dct:Agent"
+            #hack - the BBC JSON only has the mbz ID (uuid string) without the rest of the URI
+            if(contrib["musicbrainz_gid"]):
+                contrib["musicbrainz_gid"] = {
+                    "@id" :"http://musicbrainz.org/artist/" + contrib["musicbrainz_gid"]
+                }
+
 
     return segmentJson
 
@@ -86,10 +96,10 @@ def ldifyEpisode(episodeJson):
     # episode context and type
     episodeJson['@context'] = {
         "pid" : "@id",
-        "@base": "http://slobr.linkedmusic.org/",
+        "@base": "http://www.bbc.co.uk/programmes/",
         "slobr": "http://slobr.linkedmusic.org/terms/",
         "dct": "http://purl.org/dc/terms/",
-        "po": "http://www.bbc.co.uk/ontologies/programmes/",
+        "po": "http://purl.org/ontology/po/",
         "short_synopsis": "po:short_synopsis",
         "medium_synopsis": "po:medium_synopsis",
         "long_synopsis": "po:long_synopsis",
@@ -153,7 +163,7 @@ def scrape():
         # prepare next iteration (i.e. look at next-most-recent episode)
         if(episodeJson["peers"]["previous"] is not None):
             episodePid = episodeJson["peers"]["previous"]["pid"]
-            sleep(0.2) # be polite...
+            sleep(0.4) # be polite...
         else:
             # final episode
             break
